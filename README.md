@@ -94,10 +94,21 @@ sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 5 -Z SRR390728
 
 this should print five fastq lines.
 
-In the following example, six files will be downloaded using the batch submission (bsub)
+for a more real and useful example we will download six samples from Cassava
+
+first move to the scratch directory then make some folders
 
 ```
-for x in $(seq 1717931 1717936); do echo "bsub sratoolkit.2.11.0-centos_linux64/bin/fastq-dump  --split-files SRR$x";done | sh
+cd $SCRATCH
+mkdir Example
+cd Example
+mkdir FASTQ
 ```
 
-the first part `for x in $(seq 1717931 1717936)` generates the numbers to download and puts them in a for loop. The next part `do echo "bsub sratoolkit.2.11.0-centos_linux64/bin/fastq-dump  --split-files SRR$x"` writes the command. This has the path to the fastq-dump program (you may need to get the whole path if you change folder). The name of the file is also created `SRR$x` and the data split into two fastq files `–split-files`. Finally this will also submit each download as a separate job `bsub`. The `done` marks the end of the loop. The last part `| sh` takes the output from the loop add passes (pipes `|`) it to the shell `sh` terminal. If you omit the `| sh` it will print the commands to the terminal for you to check them (very useful).
+In the following example, six files will be downloaded 
+
+```
+for x in $(seq 1717931 1717936); do echo "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 100000 -Z SRR$x | paste - - - - - - - - | tee >(cut -f 1-4 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.1.fastq) | cut -f 5-8 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.2.fastq";done | bash
+```
+
+the first part `for x in $(seq 1717931 1717936)` generates the numbers to download and puts them in a for loop. The next part `do "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 100000 -Z SRR$x` writes the command. In this case it will write the first 100,000 spots. This has the path to the fastq-dump program in your `$HOME` directory. The name of the file is also created `SRR$x` and the data split into two fastq files using the `paste - - - - - - - -` and `tee`commands.  The `done` marks the end of the loop. The last part `| bash` takes the output from the loop add passes (pipes `|`) it to the shell `bash` terminal (it doesnt work with just `sh`. If you omit the `| bash` it will print the commands to the terminal for you to check them (very useful).
