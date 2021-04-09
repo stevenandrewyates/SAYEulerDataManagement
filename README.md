@@ -94,9 +94,11 @@ sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 5 -Z SRR390728
 
 this should print five fastq lines.
 
-for a more real and useful example we will download six samples from Cassava
+for a more real and useful example we will download six samples from Cassava. The data is taken from this study
 
-first move to the scratch directory then make some folders
+https://pubmed.ncbi.nlm.nih.gov/25504737/
+
+To download the data, first move to the scratch directory then make some folders.
 
 ```
 cd $SCRATCH
@@ -105,10 +107,23 @@ cd Example
 mkdir FASTQ
 ```
 
-In the following example, six files will be downloaded 
+In the following example, six files will be downloaded.
 
 ```
 for x in $(seq 1717931 1717936); do echo "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump --split-files -X 100000 -Z SRR$x | paste - - - - - - - - | tee >(cut -f 1-4 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.1.fastq) | cut -f 5-8 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.2.fastq";done | bash
 ```
 
-the first part `for x in $(seq 1717931 1717936)` generates the numbers to download and puts them in a for loop. The next part `do "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 100000 -Z SRR$x` writes the command. In this case it will write the first 100,000 spots. This has the path to the fastq-dump program in your `$HOME` directory. The name of the file is also created `SRR$x` and the data split into two fastq files using the `paste - - - - - - - -` and `tee`commands.  The `done` marks the end of the loop. The last part `| bash` takes the output from the loop add passes (pipes `|`) it to the shell `bash` terminal (it doesnt work with just `sh`. If you omit the `| bash` it will print the commands to the terminal for you to check them (very useful).
+The first part `for x in $(seq 1717931 1717936)` generates the numbers to download and puts them in a for loop. The next part `do "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X 100000 -Z SRR$x` writes the command. In this case it will write the first 100,000 spots. This has the path to the fastq-dump program in your `$HOME` directory. The name of the file is also created `SRR$x` and the data split into two fastq files using the `paste - - - - - - - -` and `tee`commands.  The `done` marks the end of the loop. The last part `| bash` takes the output from the loop add passes (pipes `|`) it to the shell `bash` terminal (it doesnt work with just `sh`. If you omit the `| bash` it will print the commands to the terminal for you to check them (very useful).
+
+# Example
+
+This git page also contains everything you need to make the scripts above run.
+
+```
+module load git
+git clone https://github.com/stevenandrewyates/SAYEulerDataManagement
+sh SAYEulerDataManagement/01_DownloadSRAtoolkit.sh
+sh SAYEulerDataManagement/02_DownloadCassavaSix.sh -f cassava -n 10
+```
+
+In the `02_DownloadCassavaSix.sh` you need to specify the directory `-f` where the data will be downloaded to and the number of reads per sample `-n`.
