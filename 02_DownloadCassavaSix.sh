@@ -55,5 +55,5 @@ echo "Making directory: FASTQ";
 mkdir FASTQ
 echo "Writing data:";
 echo "getting $Number reads per sample";
-for x in $(seq 1717931 1717936); do echo "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump -X $Number -Z SRR$x | paste - - - - - - - - | tee >(cut -f 1-4 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.1.fastq) | cut -f 5-8 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.2.fastq";done | bash
+for x in $(seq 1717931 1717936); do echo "$HOME/sratoolkit.2.11.0-centos_linux64/bin/fastq-dump --split-files -X $Number -Z SRR$x | paste - - - - - - - - | tee >(cut -f 1-4 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.1.fastq) | cut -f 5-8 | tr \"\\t\" \"\\n\" > FASTQ/SRR$x.2.fastq";done | bash
 echo "Done :)";
